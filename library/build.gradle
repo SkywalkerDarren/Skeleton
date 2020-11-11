@@ -1,4 +1,5 @@
 apply plugin: 'com.android.library'
+apply plugin: 'kotlin-android'
 apply plugin: 'com.novoda.bintray-release'
 android {
     compileSdkVersion 29
@@ -21,6 +22,7 @@ dependencies {
     implementation 'io.supercharge:shimmerlayout:2.1.0'
     implementation 'androidx.recyclerview:recyclerview:1.1.0'
     implementation 'androidx.appcompat:appcompat:1.3.0-alpha02'
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
 }
 
 publish {
@@ -32,4 +34,7 @@ publish {
     bintrayKey = ''
     desc = 'a library provider a easy way to show skeleton loading view'
     website = 'https://github.com/SkywalkerDarren/Skeleton'
+}
+repositories {
+    mavenCentral()
 }
