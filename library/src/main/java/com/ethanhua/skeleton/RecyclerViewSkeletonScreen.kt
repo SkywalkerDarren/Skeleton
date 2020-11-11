@@ -18,7 +18,7 @@ class RecyclerViewSkeletonScreen private constructor(builder: Builder) : Skeleto
     override fun show() {
         mRecyclerView.adapter = mSkeletonAdapter
         if (!mRecyclerView.isComputingLayout && mRecyclerViewFrozen) {
-            mRecyclerView.isLayoutFrozen = true
+            mRecyclerView.suppressLayout(true)
         }
     }
 
@@ -113,6 +113,10 @@ class RecyclerViewSkeletonScreen private constructor(builder: Builder) : Skeleto
             return this
         }
 
+        fun build(): RecyclerViewSkeletonScreen {
+            return RecyclerViewSkeletonScreen(this)
+        }
+
         fun show(): RecyclerViewSkeletonScreen {
             val recyclerViewSkeleton = RecyclerViewSkeletonScreen(this)
             recyclerViewSkeleton.show()
@@ -127,14 +131,15 @@ class RecyclerViewSkeletonScreen private constructor(builder: Builder) : Skeleto
     init {
         mRecyclerView = builder.mRecyclerView
         mActualAdapter = builder.mActualAdapter
-        mSkeletonAdapter = SkeletonAdapter()
-        mSkeletonAdapter.itemCount = builder.mItemCount
-        mSkeletonAdapter.setLayoutReference(builder.mItemResID)
-        mSkeletonAdapter.setArrayOfLayoutReferences(builder.mItemsResIDArray)
-        mSkeletonAdapter.shimmer(builder.mShimmer)
-        mSkeletonAdapter.setShimmerColor(builder.mShimmerColor)
-        mSkeletonAdapter.setShimmerAngle(builder.mShimmerAngle)
-        mSkeletonAdapter.setShimmerDuration(builder.mShimmerDuration)
+        mSkeletonAdapter = SkeletonAdapter().apply {
+            itemCount = builder.mItemCount
+            layoutReference = builder.mItemResID
+            layoutArrayReferences = builder.mItemsResIDArray
+            shimmer = builder.mShimmer
+            color = builder.mShimmerColor
+            shimmerAngle = builder.mShimmerAngle
+            shimmerDuration = builder.mShimmerDuration
+        }
         mRecyclerViewFrozen = builder.mFrozen
     }
 }
