@@ -5,7 +5,9 @@ import android.view.ViewGroup
 import androidx.annotation.IntRange
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
-import io.supercharge.shimmerlayout.ShimmerLayout
+import com.facebook.shimmer.Shimmer
+import com.facebook.shimmer.ShimmerFrameLayout
+
 
 /**
  * Created by ethanhua on 2017/7/29.
@@ -13,9 +15,14 @@ import io.supercharge.shimmerlayout.ShimmerLayout
 class SkeletonAdapter : RecyclerView.Adapter<ViewHolder>() {
     var layoutReference = 0
     var layoutArrayReferences: IntArray = IntArray(0)
+    var useAlpha = true
+    var direction = Direction.LEFT_TO_RIGHT
+    var alpha = 1f
+    var baseAlpha = 0.3f
     var color = 0
+    var baseColor = 0
     var shimmer = false
-    var shimmerDuration = 0
+    var shimmerDuration = 0L
     var mItemCount = 0
     @IntRange(from = 0, to = 30)
     var shimmerAngle = 0
@@ -31,12 +38,20 @@ class SkeletonAdapter : RecyclerView.Adapter<ViewHolder>() {
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         if (shimmer) {
-            (holder.itemView as ShimmerLayout).apply {
-                setShimmerAnimationDuration(shimmerDuration)
-                setShimmerAngle(shimmerAngle)
-                setShimmerColor(color)
-                startShimmerAnimation()
-            }
+            val shimmer = if (useAlpha) {
+                Shimmer.AlphaHighlightBuilder()
+                        .setBaseAlpha(baseAlpha)
+                        .setHighlightAlpha(alpha)
+            } else {
+                Shimmer.ColorHighlightBuilder()
+                        .setBaseColor(baseColor)
+                        .setHighlightColor(color)
+            }.apply {
+                setTilt(shimmerAngle.toFloat())
+                setDirection(direction.ordinal)
+                setDuration(shimmerDuration)
+            }.build()
+            (holder.itemView as ShimmerFrameLayout).setShimmer(shimmer)
         }
     }
 

@@ -6,43 +6,60 @@ import android.view.View
 import android.view.View.OnAttachStateChangeListener
 import android.view.ViewGroup
 import androidx.annotation.ColorRes
+import androidx.annotation.FloatRange
 import androidx.annotation.IntRange
 import androidx.annotation.LayoutRes
 import androidx.core.content.ContextCompat
-import io.supercharge.shimmerlayout.ShimmerLayout
+import com.facebook.shimmer.Shimmer
+import com.facebook.shimmer.ShimmerFrameLayout
 
 /**
  * Created by ethanhua on 2017/7/29.
  */
 class ViewSkeletonScreen private constructor(builder: Builder) : SkeletonScreen {
-    private val mViewReplacer: ViewReplacer
-    private val mActualView: View
-    private val mSkeletonResID: Int
-    private val mShimmerColor: Int
-    private val mShimmer: Boolean
-    private val mShimmerDuration: Int
-    private val mShimmerAngle: Int
-    private fun generateShimmerContainerLayout(parentView: ViewGroup): ShimmerLayout {
-        val shimmerLayout = LayoutInflater.from(mActualView.context).inflate(R.layout.layout_shimmer, parentView, false) as ShimmerLayout
-        shimmerLayout.setShimmerColor(mShimmerColor)
-        shimmerLayout.setShimmerAngle(mShimmerAngle)
-        shimmerLayout.setShimmerAnimationDuration(mShimmerDuration)
+    private val mViewReplacer = ViewReplacer(builder.mView)
+    private val mActualView = builder.mView
+    private val mUseAlpha = builder.mUseAlpha
+    private val mShimmerAngle = builder.mShimmerAngle
+    private val mSkeletonResID = builder.mSkeletonLayoutResID
+    private val mShimmerColor = builder.mShimmerColor
+    private val mShimmerBaseColor = builder.mShimmerBaseColor
+    private val mShimmerAlpha = builder.mShimmerAlpha
+    private val mShimmerBaseAlpha = builder.mShimmerBaseAlpha
+    private val mShimmer = builder.mShimmer
+    private val mShimmerDuration = builder.mShimmerDuration
+    private val mShimmerDirection = builder.mShimmerDirection
+    private fun generateShimmerContainerLayout(parentView: ViewGroup): ShimmerFrameLayout {
+        val shimmerLayout = LayoutInflater.from(mActualView.context).inflate(R.layout.layout_shimmer, parentView, false) as ShimmerFrameLayout
+        val shimmer = if (mUseAlpha) {
+            Shimmer.AlphaHighlightBuilder()
+                    .setBaseAlpha(mShimmerBaseAlpha)
+                    .setHighlightAlpha(mShimmerAlpha)
+        } else {
+            Shimmer.ColorHighlightBuilder()
+                    .setBaseColor(mShimmerBaseColor)
+                    .setHighlightColor(mShimmerColor)
+        }.apply {
+            setTilt(mShimmerAngle.toFloat())
+            setDirection(mShimmerDirection.ordinal)
+            setDuration(mShimmerDuration)
+        }.build()
+        shimmerLayout.setShimmer(shimmer)
         val innerView = LayoutInflater.from(mActualView.context).inflate(mSkeletonResID, shimmerLayout, false)
-        val lp = innerView.layoutParams
-        if (lp != null) {
-            shimmerLayout.layoutParams = lp
+        innerView.layoutParams?.let {
+            shimmerLayout.layoutParams = it
         }
         shimmerLayout.addView(innerView)
         shimmerLayout.addOnAttachStateChangeListener(object : OnAttachStateChangeListener {
             override fun onViewAttachedToWindow(v: View) {
-                shimmerLayout.startShimmerAnimation()
+                shimmerLayout.startShimmer()
             }
 
             override fun onViewDetachedFromWindow(v: View) {
-                shimmerLayout.stopShimmerAnimation()
+                shimmerLayout.stopShimmer()
             }
         })
-        shimmerLayout.startShimmerAnimation()
+        shimmerLayout.startShimmer()
         return shimmerLayout
     }
 
@@ -67,24 +84,42 @@ class ViewSkeletonScreen private constructor(builder: Builder) : SkeletonScreen 
     }
 
     override fun hide() {
-        if (mViewReplacer.targetView is ShimmerLayout) {
-            (mViewReplacer.targetView as ShimmerLayout?)!!.stopShimmerAnimation()
-        }
+        (mViewReplacer.targetView as? ShimmerFrameLayout)?.stopShimmer()
         mViewReplacer.restore()
     }
 
     class Builder(val mView: View) {
-        var mSkeletonLayoutResID = 0
-        var mShimmer = true
-        var mShimmerColor: Int
-        var mShimmerDuration = 1000
-        var mShimmerAngle = 20
+        internal var mSkeletonLayoutResID = 0
+        internal var mShimmer = true
+        internal var mUseAlpha = true
+        internal var mShimmerBaseAlpha = 0.4f
+        internal var mShimmerAlpha = 1f
+        internal var mShimmerColor: Int
+        internal var mShimmerBaseColor: Int
+        internal var mShimmerDuration = 1000L
+        internal var mShimmerDirection = Direction.LEFT_TO_RIGHT
+        internal var mShimmerAngle = 30
 
         /**
          * @param skeletonLayoutResID the loading skeleton layoutResID
          */
         fun load(@LayoutRes skeletonLayoutResID: Int): Builder {
             mSkeletonLayoutResID = skeletonLayoutResID
+            return this
+        }
+
+        fun baseAlpha(@FloatRange(from = 0.0, to = 1.0) alpha: Float): Builder {
+            mShimmerBaseAlpha = alpha
+            return this
+        }
+
+        fun alpha(@FloatRange(from = 0.0, to = 1.0) alpha: Float): Builder {
+            mShimmerAlpha = alpha
+            return this
+        }
+
+        fun baseColor(@ColorRes shimmerBaseColor: Int): Builder {
+            mShimmerBaseColor = ContextCompat.getColor(mView.context, mShimmerBaseColor)
             return this
         }
 
@@ -110,7 +145,7 @@ class ViewSkeletonScreen private constructor(builder: Builder) : SkeletonScreen 
          *
          * @param shimmerDuration Duration of the shimmer animation, in milliseconds
          */
-        fun duration(shimmerDuration: Int): Builder {
+        fun duration(shimmerDuration: Long): Builder {
             mShimmerDuration = shimmerDuration
             return this
         }
@@ -120,6 +155,16 @@ class ViewSkeletonScreen private constructor(builder: Builder) : SkeletonScreen 
          */
         fun angle(@IntRange(from = 0, to = 30) shimmerAngle: Int): Builder {
             mShimmerAngle = shimmerAngle
+            return this
+        }
+
+        fun direction(direction: Direction): Builder {
+            mShimmerDirection = direction
+            return this
+        }
+
+        fun setUseAlpha(use: Boolean): Builder {
+            mUseAlpha = use
             return this
         }
 
@@ -139,20 +184,11 @@ class ViewSkeletonScreen private constructor(builder: Builder) : SkeletonScreen 
 
         init {
             mShimmerColor = ContextCompat.getColor(mView.context, R.color.shimmer_color)
+            mShimmerBaseColor = ContextCompat.getColor(mView.context, R.color.shimmer_base_color)
         }
     }
 
     companion object {
         private val TAG = ViewSkeletonScreen::class.java.name
-    }
-
-    init {
-        mActualView = builder.mView
-        mSkeletonResID = builder.mSkeletonLayoutResID
-        mShimmer = builder.mShimmer
-        mShimmerDuration = builder.mShimmerDuration
-        mShimmerAngle = builder.mShimmerAngle
-        mShimmerColor = builder.mShimmerColor
-        mViewReplacer = ViewReplacer(builder.mView)
     }
 }

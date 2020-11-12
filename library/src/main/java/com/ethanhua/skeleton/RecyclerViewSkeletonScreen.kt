@@ -1,9 +1,7 @@
 package com.ethanhua.skeleton
 
-import androidx.annotation.ArrayRes
-import androidx.annotation.ColorRes
+import androidx.annotation.*
 import androidx.annotation.IntRange
-import androidx.annotation.LayoutRes
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 
@@ -11,10 +9,23 @@ import androidx.recyclerview.widget.RecyclerView
  * Created by ethanhua on 2017/7/29.
  */
 class RecyclerViewSkeletonScreen private constructor(builder: Builder) : SkeletonScreen {
-    private val mRecyclerView: RecyclerView
-    private val mActualAdapter: RecyclerView.Adapter<*>?
-    private val mSkeletonAdapter: SkeletonAdapter
-    private val mRecyclerViewFrozen: Boolean
+    private val mRecyclerView = builder.mRecyclerView
+    private val mActualAdapter = builder.mActualAdapter
+    private val mSkeletonAdapter = SkeletonAdapter().apply {
+        useAlpha = builder.mUseAlpha
+        itemCount = builder.mItemCount
+        layoutReference = builder.mItemResID
+        layoutArrayReferences = builder.mItemsResIDArray
+        shimmer = builder.mShimmer
+        alpha = builder.mShimmerAlpha
+        baseAlpha = builder.mShimmerBaseAlpha
+        color = builder.mShimmerColor
+        baseColor = builder.mShimmerBaseColor
+        shimmerAngle = builder.mShimmerAngle
+        shimmerDuration = builder.mShimmerDuration
+        direction = builder.mDirection
+    }
+    private val mRecyclerViewFrozen = builder.mFrozen
     override fun show(): RecyclerViewSkeletonScreen {
         mRecyclerView.adapter = mSkeletonAdapter
         if (!mRecyclerView.isComputingLayout && mRecyclerViewFrozen) {
@@ -28,15 +39,20 @@ class RecyclerViewSkeletonScreen private constructor(builder: Builder) : Skeleto
     }
 
     class Builder(val mRecyclerView: RecyclerView) {
-        var mActualAdapter: RecyclerView.Adapter<*>? = null
-        var mShimmer = true
-        var mItemCount = 10
-        var mItemResID = R.layout.layout_default_item_skeleton
-        var mItemsResIDArray: IntArray = IntArray(0)
-        var mShimmerColor: Int
-        var mShimmerDuration = 1000
-        var mShimmerAngle = 20
-        var mFrozen = true
+        internal var mActualAdapter: RecyclerView.Adapter<*>? = null
+        internal var mUseAlpha: Boolean = true
+        internal var mShimmer = true
+        internal var mDirection = Direction.LEFT_TO_RIGHT
+        internal var mItemCount = 10
+        internal var mItemResID = R.layout.layout_default_item_skeleton
+        internal var mItemsResIDArray: IntArray = IntArray(0)
+        internal var mShimmerBaseAlpha = 0.4f
+        internal var mShimmerAlpha = 1f
+        internal var mShimmerColor: Int
+        internal var mShimmerBaseColor: Int
+        internal var mShimmerDuration = 1000L
+        internal var mShimmerAngle = 20
+        internal var mFrozen = true
 
         /**
          * @param adapter the target recyclerView actual adapter
@@ -68,8 +84,13 @@ class RecyclerViewSkeletonScreen private constructor(builder: Builder) : Skeleto
          *
          * @param shimmerDuration Duration of the shimmer animation, in milliseconds
          */
-        fun duration(shimmerDuration: Int): Builder {
+        fun duration(shimmerDuration: Long): Builder {
             mShimmerDuration = shimmerDuration
+            return this
+        }
+
+        fun baseColor(@ColorRes color: Int): Builder {
+            mShimmerBaseColor = ContextCompat.getColor(mRecyclerView.context, color)
             return this
         }
 
@@ -78,6 +99,11 @@ class RecyclerViewSkeletonScreen private constructor(builder: Builder) : Skeleto
          */
         fun color(@ColorRes shimmerColor: Int): Builder {
             mShimmerColor = ContextCompat.getColor(mRecyclerView.context, shimmerColor)
+            return this
+        }
+
+        fun direction(direction: Direction): Builder {
+            mDirection = direction
             return this
         }
 
@@ -114,6 +140,21 @@ class RecyclerViewSkeletonScreen private constructor(builder: Builder) : Skeleto
             return this
         }
 
+        fun setUseAlpha(use: Boolean): Builder {
+            mUseAlpha = use
+            return this
+        }
+
+        fun baseAlpha(@FloatRange(from = 0.0, to = 1.0) alpha: Float): Builder {
+            mShimmerBaseAlpha = alpha
+            return this
+        }
+
+        fun alpha(@FloatRange(from = 0.0, to = 1.0) alpha: Float): Builder {
+            mShimmerAlpha = alpha
+            return this
+        }
+
         fun build(): RecyclerViewSkeletonScreen {
             return RecyclerViewSkeletonScreen(this)
         }
@@ -130,21 +171,7 @@ class RecyclerViewSkeletonScreen private constructor(builder: Builder) : Skeleto
 
         init {
             mShimmerColor = ContextCompat.getColor(mRecyclerView.context, R.color.shimmer_color)
+            mShimmerBaseColor = ContextCompat.getColor(mRecyclerView.context, R.color.shimmer_base_color)
         }
-    }
-
-    init {
-        mRecyclerView = builder.mRecyclerView
-        mActualAdapter = builder.mActualAdapter
-        mSkeletonAdapter = SkeletonAdapter().apply {
-            itemCount = builder.mItemCount
-            layoutReference = builder.mItemResID
-            layoutArrayReferences = builder.mItemsResIDArray
-            shimmer = builder.mShimmer
-            color = builder.mShimmerColor
-            shimmerAngle = builder.mShimmerAngle
-            shimmerDuration = builder.mShimmerDuration
-        }
-        mRecyclerViewFrozen = builder.mFrozen
     }
 }
