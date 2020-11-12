@@ -15,10 +15,11 @@ class SkeletonGroup: SkeletonScreen {
         skeletonSet.remove(skeleton)
     }
 
-    override fun show() {
+    override fun show(): SkeletonScreen {
         skeletonSet.forEach {
             it.show()
         }
+        return this
     }
 
     override fun hide() {
