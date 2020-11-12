@@ -11,6 +11,10 @@ class SkeletonGroup: SkeletonScreen {
         skeletonSet.add(skeleton)
     }
 
+    fun removeSkeleton(skeleton: SkeletonScreen) {
+        skeletonSet.remove(skeleton)
+    }
+
     override fun show() {
         skeletonSet.forEach {
             it.show()

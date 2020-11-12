@@ -29,7 +29,7 @@ class ViewReplacer(private val sourceView: View) {
     }
 
     fun replace(targetView: View) {
-        if (currentView === targetView) {
+        if (currentView == targetView) {
             return
         }
         if (targetView.parent != null) {
@@ -45,9 +45,9 @@ class ViewReplacer(private val sourceView: View) {
     }
 
     fun restore() {
-        if (mSourceParentView != null) {
-            mSourceParentView!!.removeView(currentView)
-            mSourceParentView!!.addView(sourceView, mSourceViewIndexInParent, mSourceViewLayoutParams)
+        mSourceParentView?.let {
+            it.removeView(currentView)
+            it.addView(sourceView, mSourceViewIndexInParent, mSourceViewLayoutParams)
             currentView = sourceView
             targetView = null
             mTargetViewResID = -1
@@ -56,17 +56,16 @@ class ViewReplacer(private val sourceView: View) {
 
     private fun init(): Boolean {
         if (mSourceParentView == null) {
-            mSourceParentView = sourceView.parent as ViewGroup
-            if (mSourceParentView == null) {
+            mSourceParentView = (sourceView.parent as? ViewGroup)?.also {
+                for (index in 0 until it.childCount) {
+                    if (sourceView == it.getChildAt(index)) {
+                        mSourceViewIndexInParent = index
+                        break
+                    }
+                }
+            } ?: run {
                 Log.e(TAG, "the source view have not attach to any view")
                 return false
-            }
-            val count = mSourceParentView!!.childCount
-            for (index in 0 until count) {
-                if (sourceView === mSourceParentView!!.getChildAt(index)) {
-                    mSourceViewIndexInParent = index
-                    break
-                }
             }
         }
         return true

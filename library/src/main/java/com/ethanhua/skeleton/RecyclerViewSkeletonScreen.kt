@@ -15,11 +15,12 @@ class RecyclerViewSkeletonScreen private constructor(builder: Builder) : Skeleto
     private val mActualAdapter: RecyclerView.Adapter<*>?
     private val mSkeletonAdapter: SkeletonAdapter
     private val mRecyclerViewFrozen: Boolean
-    override fun show() {
+    override fun show(): RecyclerViewSkeletonScreen {
         mRecyclerView.adapter = mSkeletonAdapter
         if (!mRecyclerView.isComputingLayout && mRecyclerViewFrozen) {
             mRecyclerView.suppressLayout(true)
         }
+        return this
     }
 
     override fun hide() {
@@ -117,6 +118,10 @@ class RecyclerViewSkeletonScreen private constructor(builder: Builder) : Skeleto
             return RecyclerViewSkeletonScreen(this)
         }
 
+        /**
+         * build and show skeleton screen
+         */
+        @Deprecated("use build() then show()")
         fun show(): RecyclerViewSkeletonScreen {
             val recyclerViewSkeleton = RecyclerViewSkeletonScreen(this)
             recyclerViewSkeleton.show()

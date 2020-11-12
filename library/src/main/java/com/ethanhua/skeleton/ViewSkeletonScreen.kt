@@ -58,11 +58,12 @@ class ViewSkeletonScreen private constructor(builder: Builder) : SkeletonScreen 
         } else LayoutInflater.from(mActualView.context).inflate(mSkeletonResID, parentView, false)
     }
 
-    override fun show() {
+    override fun show(): ViewSkeletonScreen {
         val skeletonLoadingView = generateSkeletonLoadingView()
         if (skeletonLoadingView != null) {
             mViewReplacer.replace(skeletonLoadingView)
         }
+        return this
     }
 
     override fun hide() {
@@ -122,6 +123,14 @@ class ViewSkeletonScreen private constructor(builder: Builder) : SkeletonScreen 
             return this
         }
 
+        fun build(): ViewSkeletonScreen {
+            return ViewSkeletonScreen(this)
+        }
+
+        /**
+         * build and show skeleton screen
+         */
+        @Deprecated("use build() then show()")
         fun show(): ViewSkeletonScreen {
             val skeletonScreen = ViewSkeletonScreen(this)
             skeletonScreen.show()
