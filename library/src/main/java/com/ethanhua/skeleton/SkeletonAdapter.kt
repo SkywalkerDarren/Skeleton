@@ -13,6 +13,10 @@ import com.facebook.shimmer.ShimmerFrameLayout
  * Created by ethanhua on 2017/7/29.
  */
 class SkeletonAdapter : RecyclerView.Adapter<ViewHolder>() {
+    var shape = Shape.LINEAR
+    var repeatCount = -1
+    var repeatDelay = 0L
+    var repeatMode = RepeatMode.RESTART
     var layoutReference = 0
     var layoutArrayReferences: IntArray = IntArray(0)
     var useAlpha = true
@@ -48,8 +52,12 @@ class SkeletonAdapter : RecyclerView.Adapter<ViewHolder>() {
                         .setHighlightColor(color)
             }.apply {
                 setTilt(shimmerAngle.toFloat())
-                setDirection(direction.ordinal)
+                setDirection(direction.value)
                 setDuration(shimmerDuration)
+                setShape(shape.value)
+                setRepeatCount(repeatCount)
+                setRepeatMode(repeatMode.value)
+                setRepeatDelay(repeatDelay)
             }.build()
             (holder.itemView as ShimmerFrameLayout).setShimmer(shimmer)
         }

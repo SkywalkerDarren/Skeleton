@@ -29,6 +29,10 @@ class ViewSkeletonScreen private constructor(builder: Builder) : SkeletonScreen 
     private val mShimmer = builder.mShimmer
     private val mShimmerDuration = builder.mShimmerDuration
     private val mShimmerDirection = builder.mShimmerDirection
+    private val mShimmerShape = builder.mShimmerShape
+    private val mRepeatCount = builder.mRepeatCount
+    private val mRepeatDelay = builder.mRepeatDelay
+    private val mRepeatMode = builder.mRepeatMode
     private fun generateShimmerContainerLayout(parentView: ViewGroup): ShimmerFrameLayout {
         val shimmerLayout = LayoutInflater.from(mActualView.context).inflate(R.layout.layout_shimmer, parentView, false) as ShimmerFrameLayout
         val shimmer = if (mUseAlpha) {
@@ -41,8 +45,12 @@ class ViewSkeletonScreen private constructor(builder: Builder) : SkeletonScreen 
                     .setHighlightColor(mShimmerColor)
         }.apply {
             setTilt(mShimmerAngle.toFloat())
-            setDirection(mShimmerDirection.ordinal)
+            setShape(mShimmerShape.value)
+            setDirection(mShimmerDirection.value)
             setDuration(mShimmerDuration)
+            setRepeatCount(mRepeatCount)
+            setRepeatDelay(mRepeatDelay)
+            setRepeatMode(mRepeatMode.value)
         }.build()
         shimmerLayout.setShimmer(shimmer)
         val innerView = LayoutInflater.from(mActualView.context).inflate(mSkeletonResID, shimmerLayout, false)
@@ -99,6 +107,10 @@ class ViewSkeletonScreen private constructor(builder: Builder) : SkeletonScreen 
         internal var mShimmerDuration = 1000L
         internal var mShimmerDirection = Direction.LEFT_TO_RIGHT
         internal var mShimmerAngle = 30
+        internal var mShimmerShape = Shape.LINEAR
+        internal var mRepeatCount = -1
+        internal var mRepeatDelay = 0L
+        internal var mRepeatMode = RepeatMode.RESTART
 
         /**
          * @param skeletonLayoutResID the loading skeleton layoutResID
@@ -119,7 +131,7 @@ class ViewSkeletonScreen private constructor(builder: Builder) : SkeletonScreen 
         }
 
         fun baseColor(@ColorRes shimmerBaseColor: Int): Builder {
-            mShimmerBaseColor = ContextCompat.getColor(mView.context, mShimmerBaseColor)
+            mShimmerBaseColor = ContextCompat.getColor(mView.context, shimmerBaseColor)
             return this
         }
 
@@ -165,6 +177,26 @@ class ViewSkeletonScreen private constructor(builder: Builder) : SkeletonScreen 
 
         fun setUseAlpha(use: Boolean): Builder {
             mUseAlpha = use
+            return this
+        }
+
+        fun shape(shape: Shape): Builder {
+            mShimmerShape = shape
+            return this
+        }
+
+        fun repeatCount(repeatCount: Int): Builder {
+            mRepeatCount = repeatCount
+            return this
+        }
+
+        fun repeatMode(repeatMode: RepeatMode): Builder {
+            mRepeatMode = repeatMode
+            return this
+        }
+
+        fun repeatDelay(repeatDelay: Long): Builder {
+            mRepeatDelay = repeatDelay
             return this
         }
 

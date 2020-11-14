@@ -24,6 +24,10 @@ class RecyclerViewSkeletonScreen private constructor(builder: Builder) : Skeleto
         shimmerAngle = builder.mShimmerAngle
         shimmerDuration = builder.mShimmerDuration
         direction = builder.mDirection
+        shape = builder.mShimmerShape
+        repeatCount = builder.mRepeatCount
+        repeatDelay = builder.mRepeatDelay
+        repeatMode = builder.mRepeatMode
     }
     private val mRecyclerViewFrozen = builder.mFrozen
     override fun show(): RecyclerViewSkeletonScreen {
@@ -53,6 +57,10 @@ class RecyclerViewSkeletonScreen private constructor(builder: Builder) : Skeleto
         internal var mShimmerDuration = 1000L
         internal var mShimmerAngle = 20
         internal var mFrozen = true
+        internal var mShimmerShape = Shape.LINEAR
+        internal var mRepeatCount = -1
+        internal var mRepeatDelay = 0L
+        internal var mRepeatMode = RepeatMode.RESTART
 
         /**
          * @param adapter the target recyclerView actual adapter
@@ -152,6 +160,26 @@ class RecyclerViewSkeletonScreen private constructor(builder: Builder) : Skeleto
 
         fun alpha(@FloatRange(from = 0.0, to = 1.0) alpha: Float): Builder {
             mShimmerAlpha = alpha
+            return this
+        }
+
+        fun shape(shape: Shape): Builder {
+            mShimmerShape = shape
+            return this
+        }
+
+        fun repeatCount(repeatCount: Int): Builder {
+            mRepeatCount = repeatCount
+            return this
+        }
+
+        fun repeatMode(repeatMode: RepeatMode): Builder {
+            mRepeatMode = repeatMode
+            return this
+        }
+
+        fun repeatDelay(repeatDelay: Long): Builder {
+            mRepeatDelay = repeatDelay
             return this
         }
 
