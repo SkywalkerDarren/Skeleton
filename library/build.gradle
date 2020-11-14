@@ -1,6 +1,7 @@
 apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
-apply plugin: 'com.novoda.bintray-release'
+apply plugin: 'com.github.panpf.bintray-publish'
+//apply plugin: 'com.novoda.bintray-release'
 android {
     compileSdkVersion 29
     defaultConfig {
@@ -33,11 +34,11 @@ dependencies {
 }
 
 publish {
-    userOrg = 'SkywalkerDarren'
-    groupId = 'com.SkywalkerDarren'
+    userOrg = 'skywalkerdarren'
+    groupId = 'com.skywalkerdarren'
     artifactId = 'skeleton'
     publishVersion = '2.0.0'
-    bintrayUser = 'SkywalkerDarren'
+    bintrayUser = 'skywalkerdarren'
     bintrayKey = ''
     desc = 'a library provider a easy way to show skeleton loading view'
     website = 'https://github.com/SkywalkerDarren/Skeleton'
