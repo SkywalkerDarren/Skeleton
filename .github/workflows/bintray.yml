@@ -6,9 +6,8 @@ name: Android CI
 # events but only for the master branch
 on:
   push:
-    branches: [ master ]
-  pull_request:
-    branches: [ master ]
+    tags:
+      - 'v*'
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
@@ -30,4 +29,4 @@ jobs:
       - name: build and publish
         env:
           BINTRAY_KEY: ${{ secrets.BINTRAY_KEY }}
-        run: ./gradlew clean build bintrayUpload -PbintrayKey="$BINTRAY_KEY" -PdryRun=true
+        run: ./gradlew clean build bintrayUpload -PbintrayKey="$BINTRAY_KEY" -PdryRun=false
