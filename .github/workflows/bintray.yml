@@ -30,4 +30,4 @@ jobs:
       - name: build and publish
         env:
           BINTRAY_KEY: ${{ secrets.BINTRAY_KEY }}
-        run: ./gradlew clean build bintrayUpload -PbintrayKey="$BINTRAY_KEY" -dryRun=true
+        run: ./gradlew clean build bintrayUpload -PbintrayKey="$BINTRAY_KEY" -PdryRun=true
