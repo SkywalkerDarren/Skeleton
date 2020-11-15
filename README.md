@@ -29,9 +29,8 @@ you can scan the qrcode for download demo apk
 In your build.gradle:
 ```
 dependencies {
-       implementation 'com.ethanhua:skeleton:1.1.2'
-       implementation 'io.supercharge:shimmerlayout:2.1.0'
-    }
+    implementation 'com.skywalkerdarren:skeleton:2.0.0'
+}
 ```
     
     
@@ -40,9 +39,10 @@ dependencies {
   For RecyclerView:
   ```java
   skeletonScreen = Skeleton.bind(recyclerView)
-                                .adapter(adapter)
-                                .load(R.layout.item_skeleton_news)
-                                .show();
+                                .adapter(adapter)                        // your actual adapter
+                                .load(R.layout.item_skeleton_news)       // skeleton item layout
+                                .build()
+                                .show()
   ``` 
        
                                 
@@ -51,20 +51,29 @@ dependencies {
   ```java
   skeletonScreen = Skeleton.bind(rootView)
                                 .load(R.layout.layout_img_skeleton)
-                                .show();
+                                .build()
+                                .show()
   ```    
        
                                 
                        
-  More Config:
-  ```java
-  .shimmer(true)      // whether show shimmer animation.                      default is true
-  .count(10)          // the recycler view item count.                        default is 10
-  .color(color)       // the shimmer color.                                   default is #a2878787
-  .angle(20)          // the shimmer angle.                                   default is 20;
-  .duration(1000)     // the shimmer animation duration.                      default is 1000;
-  .frozen(false)      // whether frozen recyclerView during skeleton showing  default is true; 
-```
+ ```java
+  .shimmer(true)                      // whether show shimmer animation.                       default is true
+  .useAlpha(true)                     // use alpha mode or color mode.                         default is true
+  .baseAlpha(0.4f)                    // the shimmer base alpha.                               default is 0.4f
+  .alpha(1f)                          // the shimmer highlight alpha.                          default is 1f
+  .baseColor(color)                   // the shimmer base color.                               default is #80878787
+  .color(color)                       // the shimmer color.                                    default is #a2878787
+  .shape(Shape.LINEAR)                // the shimmer shape.                                    default is Shape.LINEAR
+  .angle(20)                          // the shimmer angle.                                    default is 20;
+  .direction(Direction.LEFT_TO_RIGHT) // the shimmer animation direction.                      default is Direction.LEFT_TO_RIGHT
+  .duration(1000L)                    // the shimmer animation duration.                       default is 1000L
+  .repeatMode(RepeatMode.RESTART)     // the animation repeat mode.                            default is RepeatMode.RESTART
+  .repeatCount(-1)                    // the animation repeat count.(-1 is infinite)           default is -1
+  .repeatDelay(0L)                    // delay in between repeats of the shimmering animation. default is 0L
+  .count(10)                          // the recycler view item count.                         default is 10
+  .frozen(false)                      // whether frozen recyclerView during skeleton showing   default is true
+ ```
                             
   when data return you can call the method to hide skeleton loading view 
    ```java
