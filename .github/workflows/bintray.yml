@@ -27,4 +27,7 @@ jobs:
         with:
           java-version: 1.8
       - run: chmod +x gradlew
-      - run: ./gradlew clean build
+      - name: build and publish
+        env:
+          BINTRAY_KEY: ${{ secrets.BINTRAY_KEY }}
+        run: ./gradlew clean build bintrayUpload -PbintrayKey="$BINTRAY_KEY" -dryRun=true
