@@ -29,7 +29,7 @@ you can scan the qrcode for download demo apk
 In your build.gradle:
 ```
 dependencies {
-    implementation 'com.skywalkerdarren:skeleton:2.0.0'
+    implementation 'com.skywalkerdarren:skeleton:2.0.1'
 }
 ```
     
